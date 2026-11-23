@@ -1,0 +1,9 @@
+captures/
+build/
+stack/build/
+stack/build-linux/
+*.pcap
+*.pyc
+__pycache__/
+.venv/
+tools/bin/
