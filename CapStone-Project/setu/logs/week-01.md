@@ -34,3 +34,11 @@
 - **Verification:** Untested (not compiled/run here).
 - **Files changed:** `CapStone-Project\setu\stack\src\byte_stream.c`, `CapStone-Project\setu\stack\src\byte_stream.h`, `CapStone-Project\setu\logs\week-01.md`
 - **Suggested commit message:** `fix(cp0): make bs_remaining independent of closed`
+
+## Added clab-*/ to .gitignore
+- **Date:** 2026-11-23
+- **What changed:** Appended `clab-*/` to `CapStone-Project\setu\.gitignore`.
+- **Why:** Containerlab runtime output directories (`clab-*/`) contain generated CA private keys and must never be committed.
+- **Verification:** Untested (not run here).
+- **Files changed:** `CapStone-Project\setu\.gitignore`, `CapStone-Project\setu\logs\week-01.md`
+- **Suggested commit message:** `chore(repo): ignore containerlab clab-*/ runtime directories`
