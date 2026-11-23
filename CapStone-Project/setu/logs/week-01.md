@@ -54,3 +54,10 @@
 - **Verification:** Untested (not compiled/run here).
 - **Files changed:** `CapStone-Project\setu\stack\src\webget.c`, `CapStone-Project\setu\logs\week-01.md`
 - **Suggested commit message:** `feat(cp0): implement webget client with error handling`
+
+## Created W01-DELAY-ACCOUNTING.md
+- **Date:** 2026-11-23
+- **What was asked:** Create `link/verify/W01-DELAY-ACCOUNTING.md` with measured RTT table, conditions, delay terms breakdown, and conclusions.
+- **Verification:** Nothing tested here.
+- **Files created/changed:** `CapStone-Project\setu\link\verify\W01-DELAY-ACCOUNTING.md`, `CapStone-Project\setu\logs\week-01.md`
+- **Suggested commit message:** `docs(w01): add delay accounting breakdown`
