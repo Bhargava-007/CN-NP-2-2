@@ -18,3 +18,11 @@
   - The WSL distro must be kept alive with a hidden `sleep infinity` or containers restart and lose links.
 - **Files created/changed:** `CapStone-Project\setu\link\verify\W01-FIELD-DIFF.md`, `CapStone-Project\setu\logs\week-01.md`
 - **Suggested commit message:** `docs(w01): add field-diff table and capture notes`
+
+## Replaced ByteStream with own ring-buffer implementation (CP0)
+- **Date:** 2026-11-23
+- **What was asked:** Replace the shipped reference `byte_stream.h` and `byte_stream.c` with own C17 ring-buffer implementation.
+- **Why:** Own implementation replaces the shipped reference; the shipped originals remain in git history (commit `e09d168`).
+- **Verification:** Not tested (no compiler/WSL run here).
+- **Files changed:** `CapStone-Project\setu\stack\src\byte_stream.h`, `CapStone-Project\setu\stack\src\byte_stream.c`, `CapStone-Project\setu\logs\week-01.md`
+- **Suggested commit message:** `feat(cp0): implement ring-buffer ByteStream`
