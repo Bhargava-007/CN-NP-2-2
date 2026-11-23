@@ -1,0 +1,15 @@
+# Week 1 - the smallest topology that shows switch vs router behaviour.
+# Deploy from PowerShell:  Start-SetuLab .\link\topology\w01-skeleton.clab.yml
+name: setu-w01
+topology:
+  nodes:
+    sw-c:  {kind: linux, image: nicolaka/netshoot}
+    rtr:   {kind: linux, image: frrouting/frr:latest}
+    sw-dc: {kind: linux, image: nicolaka/netshoot}
+    dev01: {kind: linux, image: nicolaka/netshoot}                     # instrumentation device
+    srv01: {kind: linux, image: nicolaka/netshoot, ports: ["8080:8080"]} # service; port 8080 reachable from Windows
+  links:
+    - endpoints: ["dev01:eth1", "sw-c:eth1"]   # tap 1 is dev01:eth1
+    - endpoints: ["sw-c:eth2",  "rtr:eth1"]    # tap 2 is rtr:eth1
+    - endpoints: ["rtr:eth2",   "sw-dc:eth1"]
+    - endpoints: ["sw-dc:eth2", "srv01:eth1"]  # tap 3 is srv01:eth1

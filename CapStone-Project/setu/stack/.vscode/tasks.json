@@ -1,0 +1,10 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    { "label": "setu: configure", "type": "shell", "command": "cmake -S . -B build", "options": { "cwd": "${workspaceFolder}" } },
+    { "label": "setu: build", "type": "shell", "command": "cmake --build build --config Debug", "options": { "cwd": "${workspaceFolder}" },
+      "dependsOn": "setu: configure", "group": { "kind": "build", "isDefault": true }, "problemMatcher": ["$msCompile"] },
+    { "label": "setu: test", "type": "shell", "command": "ctest --test-dir build -C Debug --output-on-failure", "options": { "cwd": "${workspaceFolder}" },
+      "dependsOn": "setu: build", "group": "test" }
+  ]
+}

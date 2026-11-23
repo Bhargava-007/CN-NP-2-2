@@ -1,0 +1,30 @@
+# Week 3-4 - address plan applied, DHCP through a relay, DNS server.
+# Deploy:  Start-SetuLab .\link\topology\w03-services.clab.yml
+name: setu-w03
+topology:
+  nodes:
+    sw-c:  {kind: linux, image: nicolaka/netshoot}
+    rtr:   {kind: linux, image: frrouting/frr:latest,
+            exec: ["ip addr add 10.20.36.1/23 dev eth1", "ip addr add 10.20.48.1/24 dev eth2", "sysctl -w net.ipv4.ip_forward=1"]}
+    sw-dc: {kind: linux, image: nicolaka/netshoot}
+    dev01: {kind: linux, image: nicolaka/netshoot}   # DHCP client this week
+    srv01: {kind: linux, image: nicolaka/netshoot, ports: ["8080:8080"],
+            exec: ["ip addr add 10.20.48.12/24 dev eth1", "ip route replace default via 10.20.48.1"]}
+    kea01:
+      kind: linux
+      image: debian:bookworm-slim
+      binds: ["../config/kea-dhcp4.conf:/etc/kea/kea-dhcp4.conf"]
+      cmd: bash -c "apt-get update -q && apt-get install -y -q kea-dhcp4-server iproute2 && sleep 3 && ip addr add 10.20.48.20/24 dev eth1 && ip route replace default via 10.20.48.1 && mkdir -p /run/kea && exec kea-dhcp4 -c /etc/kea/kea-dhcp4.conf"
+    ns1:
+      kind: linux
+      image: ubuntu/bind9:latest
+      ports: ["5353:53/udp"]
+      binds: ["../config/named.conf.local:/etc/bind/named.conf.local", "../config/db.setu.local:/etc/bind/db.setu.local"]
+      exec: ["ip addr add 10.20.48.10/24 dev eth1", "ip route replace default via 10.20.48.1"]
+  links:
+    - endpoints: ["dev01:eth1", "sw-c:eth1"]
+    - endpoints: ["sw-c:eth2",  "rtr:eth1"]
+    - endpoints: ["rtr:eth2",   "sw-dc:eth1"]
+    - endpoints: ["sw-dc:eth2", "srv01:eth1"]
+    - endpoints: ["sw-dc:eth3", "kea01:eth1"]
+    - endpoints: ["sw-dc:eth4", "ns1:eth1"]

@@ -1,0 +1,53 @@
+# Week 8, part 2 - the campus edge: two providers (BGP), NAT at each edge, a VRRP gateway pair for BLD-C with
+# interface tracking, and IPv6 (OSPFv3 + router advertisements) alongside IPv4.
+# Deploy:  Start-SetuLab C:\setu\link\topology\w08-edge.clab.yml      (needs internet the first time: the routers
+# install iptables and keepalived from the Alpine package mirror before the default route is handed to OSPF)
+name: setu-w08e
+topology:
+  defaults:
+    kind: linux
+  nodes:
+    core1: {image: frrouting/frr:latest, binds: ["../config/frr-w08e/daemons:/etc/frr/daemons", "../config/frr-w08e/core1.conf:/etc/frr/frr.conf"],
+            exec: ["apk add --no-cache iptables", "ip route del default", "sysctl -w net.ipv4.ip_forward=1", "sysctl -w net.ipv6.conf.all.disable_ipv6=0", "sysctl -w net.ipv6.conf.all.forwarding=1",
+                   "iptables -t nat -A POSTROUTING -s 10.20.0.0/16 -o eth5 -j MASQUERADE"]}
+    core2: {image: frrouting/frr:latest, binds: ["../config/frr-w08e/daemons:/etc/frr/daemons", "../config/frr-w08e/core2.conf:/etc/frr/frr.conf"],
+            exec: ["apk add --no-cache iptables", "ip route del default", "sysctl -w net.ipv4.ip_forward=1", "sysctl -w net.ipv6.conf.all.disable_ipv6=0", "sysctl -w net.ipv6.conf.all.forwarding=1",
+                   "iptables -t nat -A POSTROUTING -s 10.20.0.0/16 -o eth5 -j MASQUERADE"]}
+    r-c:   {image: frrouting/frr:latest, binds: ["../config/frr-w08e/daemons:/etc/frr/daemons", "../config/frr-w08e/r-c.conf:/etc/frr/frr.conf", "../config/frr-w08e/keepalived-r-c.conf:/etc/keepalived/keepalived.conf"],
+            exec: ["apk add --no-cache keepalived", "ip route del default", "sysctl -w net.ipv4.ip_forward=1", "sysctl -w net.ipv6.conf.all.disable_ipv6=0", "sysctl -w net.ipv6.conf.all.forwarding=1", "keepalived -f /etc/keepalived/keepalived.conf"]}
+    r-c2:  {image: frrouting/frr:latest, binds: ["../config/frr-w08e/daemons:/etc/frr/daemons", "../config/frr-w08e/r-c2.conf:/etc/frr/frr.conf", "../config/frr-w08e/keepalived-r-c2.conf:/etc/keepalived/keepalived.conf"],
+            exec: ["apk add --no-cache keepalived", "ip route del default", "sysctl -w net.ipv4.ip_forward=1", "sysctl -w net.ipv6.conf.all.disable_ipv6=0", "sysctl -w net.ipv6.conf.all.forwarding=1", "keepalived -f /etc/keepalived/keepalived.conf"]}
+    r-dc:  {image: frrouting/frr:latest, binds: ["../config/frr-w08e/daemons:/etc/frr/daemons", "../config/frr-w08e/r-dc.conf:/etc/frr/frr.conf"],
+            exec: ["ip route del default", "sysctl -w net.ipv4.ip_forward=1", "sysctl -w net.ipv6.conf.all.disable_ipv6=0", "sysctl -w net.ipv6.conf.all.forwarding=1"]}
+    isp1:  {image: frrouting/frr:latest, binds: ["../config/frr-w08e/daemons:/etc/frr/daemons", "../config/frr-w08e/isp1.conf:/etc/frr/frr.conf"],
+            exec: ["ip route del default", "sysctl -w net.ipv4.ip_forward=1"]}
+    isp2:  {image: frrouting/frr:latest, binds: ["../config/frr-w08e/daemons:/etc/frr/daemons", "../config/frr-w08e/isp2.conf:/etc/frr/frr.conf"],
+            exec: ["ip route del default", "sysctl -w net.ipv4.ip_forward=1"]}
+    inet:  {image: nicolaka/netshoot,       # "the internet": one server reachable through either provider
+            exec: ["ip addr add 100.64.1.2/30 dev eth1", "ip addr add 100.64.2.2/30 dev eth2", "ip addr add 203.0.113.10/32 dev lo",
+                   "ip route add 192.0.2.0/30 via 100.64.1.1", "ip route add 198.51.100.0/30 via 100.64.2.1"]}
+    sw-c:  {image: nicolaka/netshoot,       # the BLD-C access switch both gateways and the host plug into
+            exec: ["ip link add br0 type bridge", "ip link set eth1 master br0", "ip link set eth2 master br0", "ip link set eth3 master br0",
+                   "ip link set br0 up", "ip link set eth1 up", "ip link set eth2 up", "ip link set eth3 up"]}
+    hc:    {image: nicolaka/netshoot,
+            exec: ["sysctl -w net.ipv6.conf.all.disable_ipv6=0", "sysctl -w net.ipv6.conf.eth1.accept_ra=2",
+                   "ip addr add 10.20.36.10/23 dev eth1", "ip route replace default via 10.20.36.1"]}
+    hdc:   {image: nicolaka/netshoot,
+            exec: ["sysctl -w net.ipv6.conf.all.disable_ipv6=0", "sysctl -w net.ipv6.conf.eth1.accept_ra=2",
+                   "ip addr add 10.20.48.12/24 dev eth1", "ip route replace default via 10.20.48.1"]}
+  links:
+    - endpoints: ["core1:eth1", "core2:eth1"]
+    - endpoints: ["r-c:eth1",   "core1:eth2"]
+    - endpoints: ["r-c:eth2",   "core2:eth2"]
+    - endpoints: ["r-dc:eth1",  "core1:eth3"]
+    - endpoints: ["r-dc:eth2",  "core2:eth3"]
+    - endpoints: ["r-c2:eth1",  "core1:eth4"]
+    - endpoints: ["r-c2:eth2",  "core2:eth4"]
+    - endpoints: ["core1:eth5", "isp1:eth1"]
+    - endpoints: ["core2:eth5", "isp2:eth1"]
+    - endpoints: ["isp1:eth2",  "inet:eth1"]
+    - endpoints: ["isp2:eth2",  "inet:eth2"]
+    - endpoints: ["r-c:eth3",   "sw-c:eth1"]
+    - endpoints: ["r-c2:eth3",  "sw-c:eth2"]
+    - endpoints: ["hc:eth1",    "sw-c:eth3"]
+    - endpoints: ["r-dc:eth3",  "hdc:eth1"]

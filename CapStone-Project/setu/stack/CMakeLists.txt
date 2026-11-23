@@ -1,0 +1,42 @@
+# SETU-STACK - builds with Visual Studio 2022 (MSVC) on Windows, and with gcc in the lab engine.
+#   PowerShell:  cmake -S . -B build ; cmake --build build --config Debug ; ctest --test-dir build -C Debug
+cmake_minimum_required(VERSION 3.20)
+project(setu_stack C)
+set(CMAKE_C_STANDARD 17)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+if(MSVC)
+  add_compile_options(/W4 /D_CRT_SECURE_NO_WARNINGS)
+else()
+  add_compile_options(-Wall -Wextra -Werror)
+endif()
+
+function(setu_net_exe name)
+  add_executable(${name} ${ARGN})
+  if(WIN32)
+    target_link_libraries(${name} ws2_32)
+  elseif(${name} STREQUAL "server_models")
+    find_package(Threads REQUIRED)
+    target_link_libraries(${name} Threads::Threads)
+  endif()
+endfunction()
+
+add_library(setu_core STATIC src/byte_stream.c src/tcp_core.c src/router_lpm.c src/crc32.c)
+
+setu_net_exe(webget        src/webget.c)
+setu_net_exe(http_server   src/http_server.c)
+setu_net_exe(dns_resolve   src/dns_resolve.c)
+setu_net_exe(server_models src/server_models.c)
+if(WIN32)
+  setu_net_exe(server_iocp src/server_iocp.c)       # optional Windows extension of model 4
+else()
+  add_executable(server_epoll src/server_epoll.c)   # model 4 (reference)
+endif()
+add_executable(setu_tcp src/setu_tcp.c)
+target_link_libraries(setu_tcp setu_core)
+
+enable_testing()
+foreach(t byte_stream tcp_core router_lpm crc32)
+  add_executable(test_${t} tests/test_${t}.c)
+  target_link_libraries(test_${t} setu_core)
+  add_test(NAME ${t} COMMAND test_${t})
+endforeach()

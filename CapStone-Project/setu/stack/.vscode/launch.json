@@ -1,0 +1,14 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    { "name": "Debug test_byte_stream (CP0)", "type": "cppvsdbg", "request": "launch", "program": "${workspaceFolder}/build/Debug/test_byte_stream.exe", "cwd": "${workspaceFolder}", "preLaunchTask": "setu: build" },
+    { "name": "Debug webget localhost:8080", "type": "cppvsdbg", "request": "launch", "program": "${workspaceFolder}/build/Debug/webget.exe", "args": ["localhost", "/", "8080"], "cwd": "${workspaceFolder}", "preLaunchTask": "setu: build" },
+    { "name": "Debug http_server :8081", "type": "cppvsdbg", "request": "launch", "program": "${workspaceFolder}/build/Debug/http_server.exe", "args": ["8081"], "cwd": "${workspaceFolder}", "preLaunchTask": "setu: build" },
+    { "name": "Debug dns_resolve (lab DNS)", "type": "cppvsdbg", "request": "launch", "program": "${workspaceFolder}/build/Debug/dns_resolve.exe", "args": ["readings.setu.local", "A", "127.0.0.1", "5353"], "cwd": "${workspaceFolder}", "preLaunchTask": "setu: build" },
+    { "name": "Debug server_models poll :8082", "type": "cppvsdbg", "request": "launch", "program": "${workspaceFolder}/build/Debug/server_models.exe", "args": ["poll", "8082"], "cwd": "${workspaceFolder}", "preLaunchTask": "setu: build" },
+    { "name": "Debug server_iocp :8083", "type": "cppvsdbg", "request": "launch", "program": "${workspaceFolder}/build/Debug/server_iocp.exe", "args": ["8083"], "cwd": "${workspaceFolder}", "preLaunchTask": "setu: build" },
+    { "name": "Debug test_tcp_core (CP3-5)", "type": "cppvsdbg", "request": "launch", "program": "${workspaceFolder}/build/Debug/test_tcp_core.exe", "cwd": "${workspaceFolder}", "preLaunchTask": "setu: build" },
+    { "name": "Debug test_router_lpm (CP6)", "type": "cppvsdbg", "request": "launch", "program": "${workspaceFolder}/build/Debug/test_router_lpm.exe", "cwd": "${workspaceFolder}", "preLaunchTask": "setu: build" },
+    { "name": "Debug test_crc32 (CP7)", "type": "cppvsdbg", "request": "launch", "program": "${workspaceFolder}/build/Debug/test_crc32.exe", "cwd": "${workspaceFolder}", "preLaunchTask": "setu: build" }
+  ]
+}

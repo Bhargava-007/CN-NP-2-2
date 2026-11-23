@@ -1,0 +1,48 @@
+# site.yml - the routed estate, declared and ASSERTED. Uses only the 'raw' module, so the
+# routers need no Python. Run twice: the second run must report changed=0.
+- name: Routers carry exactly the configuration in the repository
+  hosts: routers
+  gather_facts: false
+  vars:
+    desired: "{{ lookup('file', playbook_dir + '/../config/frr/' + inventory_hostname + '.conf') }}"
+  tasks:
+    - name: Read the running configuration
+      ansible.builtin.raw: vtysh -c 'show running-config' | sed -n '/^interface\|^router ospf/,$p'
+      register: running
+      changed_when: false
+
+    - name: Apply the repository configuration when it differs (idempotent)
+      ansible.builtin.raw: |
+        cat > /tmp/desired.conf <<'SETU'
+        {{ desired }}
+        SETU
+        vtysh -f /tmp/desired.conf && vtysh -c 'write memory'
+      when: "'auto-cost reference-bandwidth 100000' not in running.stdout"
+
+- name: Assert the invariants the design depends on
+  hosts: routers
+  gather_facts: false
+  tasks:
+    - name: Count OSPF routes seen by this router
+      ansible.builtin.raw: vtysh -c 'show ip route ospf' | grep -c '^O' || true
+      register: ospf_routes
+      changed_when: false
+
+    - name: Count FULL OSPF neighbours
+      ansible.builtin.raw: vtysh -c 'show ip ospf neighbor' | grep -c 'Full' || true
+      register: full_neighbours
+      changed_when: false
+
+    - name: Read the BFD peer states
+      ansible.builtin.raw: vtysh -c 'show bfd peers brief' || true
+      register: bfd
+      changed_when: false
+
+    - name: Design invariants (weeks 3, 8)
+      ansible.builtin.assert:
+        that:
+          - (ospf_routes.stdout | trim | int) <= 12        # summarisation generated: one prefix per site, not every segment
+          - (full_neighbours.stdout | trim | int) >= 2     # every router has two adjacencies (redundant core)
+          - "'down' not in (bfd.stdout | lower)"           # fast failure detection is live
+        fail_msg: "{{ inventory_hostname }}: OSPF routes={{ ospf_routes.stdout | trim }}, FULL neighbours={{ full_neighbours.stdout | trim }}"
+        success_msg: "{{ inventory_hostname }}: invariants hold"

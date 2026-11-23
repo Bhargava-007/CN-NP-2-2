@@ -1,0 +1,21 @@
+# Week 8 - two cores, two site routers (BLD-C and DC), OSPF areas with one summary per site, BFD.
+# Deploy:  Start-SetuLab .\link\topology\w08-ospf.clab.yml
+name: setu-w08
+topology:
+  defaults:
+    kind: linux
+  nodes:
+    core1: {image: frrouting/frr:latest, binds: ["../config/frr/daemons:/etc/frr/daemons", "../config/frr/core1.conf:/etc/frr/frr.conf"]}
+    core2: {image: frrouting/frr:latest, binds: ["../config/frr/daemons:/etc/frr/daemons", "../config/frr/core2.conf:/etc/frr/frr.conf"]}
+    r-c:   {image: frrouting/frr:latest, binds: ["../config/frr/daemons:/etc/frr/daemons", "../config/frr/r-c.conf:/etc/frr/frr.conf"]}
+    r-dc:  {image: frrouting/frr:latest, binds: ["../config/frr/daemons:/etc/frr/daemons", "../config/frr/r-dc.conf:/etc/frr/frr.conf"]}
+    hc:    {image: nicolaka/netshoot, exec: ["ip addr add 10.20.36.10/23 dev eth1", "ip route replace default via 10.20.36.1"]}
+    hdc:   {image: nicolaka/netshoot, exec: ["ip addr add 10.20.48.12/24 dev eth1", "ip route replace default via 10.20.48.1"]}
+  links:
+    - endpoints: ["core1:eth1", "core2:eth1"]
+    - endpoints: ["r-c:eth1",   "core1:eth2"]
+    - endpoints: ["r-c:eth2",   "core2:eth2"]
+    - endpoints: ["r-dc:eth1",  "core1:eth3"]
+    - endpoints: ["r-dc:eth2",  "core2:eth3"]
+    - endpoints: ["r-c:eth3",   "hc:eth1"]
+    - endpoints: ["r-dc:eth3",  "hdc:eth1"]

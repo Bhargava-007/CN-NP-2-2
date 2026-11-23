@@ -1,0 +1,13 @@
+# Inventory for the week 8 lab (setu-w08). Devices are reached through Docker inside the lab engine.
+# Run from PowerShell:  Invoke-SetuAnsible            (first time: Invoke-SetuWsl 'ansible-galaxy collection install community.docker')
+all:
+  vars:
+    ansible_connection: community.docker.docker
+    lab: setu-w08
+  children:
+    routers:
+      hosts:
+        core1: { ansible_host: clab-setu-w08-core1, loopback: 10.20.254.1 }
+        core2: { ansible_host: clab-setu-w08-core2, loopback: 10.20.254.2 }
+        r-c:   { ansible_host: clab-setu-w08-r-c,   loopback: 10.20.254.3 }
+        r-dc:  { ansible_host: clab-setu-w08-r-dc,  loopback: 10.20.254.4 }

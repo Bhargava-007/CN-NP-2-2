@@ -1,0 +1,22 @@
+# Week 12 - instrument path under contention: sensor -> r-edge -> r-wan -> collector, with a bulk flow sharing r-edge:eth2.
+# Deploy:  Start-SetuLab .\link\topology\w12-qos.clab.yml
+name: setu-w12
+topology:
+  defaults:
+    kind: linux
+    image: nicolaka/netshoot
+  nodes:
+    sensor:    {exec: ["ip addr add 10.20.38.10/23 dev eth1", "ip route replace default via 10.20.38.1"]}
+    bulk1:     {exec: ["ip addr add 10.20.40.10/24 dev eth1", "ip route replace default via 10.20.40.1"]}
+    r-edge:    {exec: ["ip addr add 10.20.38.1/23 dev eth1", "ip addr add 10.20.40.1/24 dev eth3", "ip addr add 10.20.255.10/31 dev eth2",
+                       "ip route replace default via 10.20.255.11", "sysctl -w net.ipv4.ip_forward=1"]}
+    r-wan:     {exec: ["ip addr add 10.20.255.11/31 dev eth1", "ip addr add 10.20.48.1/24 dev eth2", "ip addr add 10.20.49.1/24 dev eth3",
+                       "ip route replace 10.20.38.0/23 via 10.20.255.10", "ip route replace 10.20.40.0/24 via 10.20.255.10", "sysctl -w net.ipv4.ip_forward=1"]}
+    collector: {exec: ["ip addr add 10.20.48.30/24 dev eth1", "ip route replace default via 10.20.48.1"]}
+    bulk2:     {exec: ["ip addr add 10.20.49.10/24 dev eth1", "ip route replace default via 10.20.49.1"]}
+  links:
+    - endpoints: ["sensor:eth1",  "r-edge:eth1"]
+    - endpoints: ["bulk1:eth1",   "r-edge:eth3"]
+    - endpoints: ["r-edge:eth2",  "r-wan:eth1"]    # the contended link
+    - endpoints: ["r-wan:eth2",   "collector:eth1"]
+    - endpoints: ["r-wan:eth3",   "bulk2:eth1"]

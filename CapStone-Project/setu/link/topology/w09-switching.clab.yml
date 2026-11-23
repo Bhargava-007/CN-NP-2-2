@@ -1,0 +1,22 @@
+# Week 9 - three switches in a triangle (a loop on purpose) plus a two-link bond, and hosts in VLANs 10 and 20.
+# Deploy:  Start-SetuLab .\link\topology\w09-switching.clab.yml   then follow the week 9 steps.
+name: setu-w09
+topology:
+  defaults:
+    kind: linux
+    image: nicolaka/netshoot
+  nodes:
+    sw-core: {}
+    sw-a: {}
+    sw-b: {}
+    h-a10: {exec: ["ip addr add 10.20.40.11/24 dev eth1"]}   # staff VLAN 10 on sw-a
+    h-b10: {exec: ["ip addr add 10.20.40.12/24 dev eth1"]}   # staff VLAN 10 on sw-b
+    h-a20: {exec: ["ip addr add 10.20.32.11/22 dev eth1"]}   # student VLAN 20 on sw-a
+  links:
+    - endpoints: ["sw-core:eth1", "sw-a:eth1"]     # trunk
+    - endpoints: ["sw-core:eth2", "sw-b:eth1"]     # trunk
+    - endpoints: ["sw-a:eth2",    "sw-b:eth2"]     # trunk - closes the loop; STP must block one port
+    - endpoints: ["sw-core:eth3", "sw-b:eth3"]     # second core link for the LACP bond (with eth2)
+    - endpoints: ["sw-a:eth3",    "h-a10:eth1"]
+    - endpoints: ["sw-a:eth4",    "h-a20:eth1"]
+    - endpoints: ["sw-b:eth4",    "h-b10:eth1"]
