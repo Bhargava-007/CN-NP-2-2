@@ -19,6 +19,9 @@
 | User env var `SETU_DISTRO=setu-lab` | User environment | `[Environment]::SetEnvironmentVariable('SETU_DISTRO',$null,'User')` |
 | Temp files | `$env:TEMP\wsl-*.txt` | `Remove-Item $env:TEMP\wsl-*.txt` |
 | Cancelled `wsl --install -d Ubuntu-24.04` (no distro was registered; any cached download is unverified) | unknown | check `%TEMP%` and `%LOCALAPPDATA%\Packages` for leftovers at the end |
+| Packages inside setu-lab: curl ca-certificates tcpdump tshark iperf3 jq ethtool iproute2 build-essential cmake netcat-openbsd python3 python3-venv git ansible docker.io (about 1.3 GB added, measured: distro 2.0 GB -> 3.3 GB) | inside setu-lab only | removed by: `wsl --unregister setu-lab` |
+| Docker 29.1.3 (Ubuntu docker.io package, enabled via systemd) | inside setu-lab | removed by: `wsl --unregister setu-lab` |
+| containerlab 0.83.0 from apt source `/etc/apt/sources.list.d/netdevops.list` (`deb [trusted=yes] https://netdevops.fury.site/apt/ /`, unsigned repo, accepted risk, confined to setu-lab) | inside setu-lab | removed by: `wsl --unregister setu-lab` |
 
 ## Final cleanup
 - [ ] `wsl --unregister setu-lab ; Remove-Item -Recurse $env:LOCALAPPDATA\setu-lab`
@@ -28,3 +31,8 @@
 - [ ] `git rm -r CapStone-Project/setu` (or delete the `setu` folder)
 
 Pre-existing distro "Ubuntu" is left alone.
+
+## Week 0 verification (2026-11-23)
+- `Test-SetuHost` result: `sch_netem`, `sch_htb`, `sch_fq_codel`, `tun`, `bonding`, `8021q`, `openvswitch`, `nf_conntrack`, `netem-functional`, `dev-net-tun`, `docker`, `containerlab` all OK; `mac802154_hwsim` MISSING (optional, week 10); cores 8; memoryGB 7.8.
+- Tools verified inside `setu-lab`: `gcc` 15.2.0, `cmake` 4.2.3, `tshark` 4.6.4, `iperf3` 3.20, `ansible-core` 2.20.1, Docker 29.1.3 (cgroup v2, systemd driver).
+- Download speed from inside `setu-lab` measured about 50 MB/s to Cloudflare; `archive.ubuntu.com` and `netdevops.fury.site` were slow (about 143 KB/s).
