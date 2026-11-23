@@ -42,3 +42,15 @@
 - **Verification:** Untested (not run here).
 - **Files changed:** `CapStone-Project\setu\.gitignore`, `CapStone-Project\setu\logs\week-01.md`
 - **Suggested commit message:** `chore(repo): ignore containerlab clab-*/ runtime directories`
+
+## Replaced webget.c with own implementation (CP0 part 1b)
+- **Date:** 2026-11-23
+- **What was asked:** Overwrite `stack/src/webget.c` with own C17 implementation using `platform.h` (originals remain in git history at `e09d168`).
+- **Why:** Own implementation replaces the shipped reference, adding explicit error handling and cleanup.
+- **Improvements implemented:**
+  1. Checked `snprintf` return value so an oversized request fails with an error and exit `1` instead of sending a truncated request.
+  2. Single `cleanup` path (`goto cleanup`) closing the socket if open and calling `net_cleanup()`, with exit codes `0` (ok), `1` (runtime error), `2` (usage).
+  3. On `recv` error (`< 0`), prints `sock_errno()` and exits `1` instead of `0`.
+- **Verification:** Untested (not compiled/run here).
+- **Files changed:** `CapStone-Project\setu\stack\src\webget.c`, `CapStone-Project\setu\logs\week-01.md`
+- **Suggested commit message:** `feat(cp0): implement webget client with error handling`
