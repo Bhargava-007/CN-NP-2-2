@@ -31,8 +31,14 @@ function Invoke-SetuWsl {
     [CmdletBinding()] param([Parameter(Mandatory)][string]$Command, [switch]$AllowFailure)
     Write-Verbose "engine> $Command"
     $b64 = ConvertTo-SetuB64 $Command
-    $out = & wsl.exe -d $script:Distro -u root -- bash -c "echo $b64 | base64 -d | bash" 2>&1
-    $code = $LASTEXITCODE
+    $prevEap = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try {
+        $out = & wsl.exe -d $script:Distro -u root -- bash -c "echo $b64 | base64 -d | bash" 2>&1 | ForEach-Object { "$_" }
+        $code = $LASTEXITCODE
+    } finally {
+        $ErrorActionPreference = $prevEap
+    }
     if ($code -ne 0 -and -not $AllowFailure) {
         throw "Lab engine command failed (exit $code): $Command`n$($out -join [Environment]::NewLine)"
     }
