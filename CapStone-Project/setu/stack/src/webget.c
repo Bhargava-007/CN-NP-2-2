@@ -1,52 +1,121 @@
-/* webget.c - CP0 part 1b: fetch a page over a kernel TCP socket (Winsock on Windows).
-   Usage:  webget.exe <host> <path> [port]        e.g.  webget.exe localhost / 8080       */
 #include "platform.h"
+
+#include <inttypes.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
-static int send_all(sock_t s, const char *p, size_t n) {
-    while (n > 0) {                               /* send() may accept fewer bytes than offered */
-        int k = send(s, p, (int)n, 0);
-        if (k <= 0) return -1;
-        p += k; n -= (size_t)k;
+static int send_all(sock_t s, const char *buf, size_t len) {
+    size_t sent = 0;
+    /* TCP send() may accept fewer bytes than requested; loop until all bytes are sent. */
+    while (sent < len) {
+#ifdef _WIN32
+        int n = send(s, buf + sent, (int)(len - sent), 0);
+#else
+        ssize_t n = send(s, buf + sent, len - sent, 0);
+#endif
+        if (n <= 0) {
+            return -1;
+        }
+        sent += (size_t)n;
     }
     return 0;
 }
 
 int main(int argc, char **argv) {
-    if (argc < 3) { fprintf(stderr, "usage: %s <host> <path> [port]\n", argv[0]); return 2; }
-    const char *host = argv[1], *path = argv[2], *port = argc > 3 ? argv[3] : "80";
-    if (net_init() != 0) { fprintf(stderr, "WSAStartup failed\n"); return 1; }
+    if (argc < 3 || argc > 4) {
+        fprintf(stderr, "Usage: %s <host> <path> [port]\n", argc > 0 ? argv[0] : "webget");
+        return 2;
+    }
 
-    struct addrinfo hints = {0}, *res = NULL;
-    hints.ai_family = AF_UNSPEC; hints.ai_socktype = SOCK_STREAM;
-    int rc = getaddrinfo(host, port, &hints, &res);          /* DNS lookup (week 4 does this by hand) */
-    if (rc != 0) { fprintf(stderr, "getaddrinfo: %d\n", rc); net_cleanup(); return 1; }
+    const char *host = argv[1];
+    const char *path = argv[2];
+    const char *port = (argc == 4) ? argv[3] : "80";
 
-    sock_t s = SETU_BAD_SOCK;
-    for (struct addrinfo *a = res; a; a = a->ai_next) {
-        s = socket(a->ai_family, a->ai_socktype, a->ai_protocol);
-        if (s == SETU_BAD_SOCK) continue;
-        if (connect(s, a->ai_addr, (sock_len_t)a->ai_addrlen) == 0) break;   /* three-way handshake */
-        sock_close(s); s = SETU_BAD_SOCK;
+    if (net_init() != 0) {
+        fprintf(stderr, "webget: net_init failed\n");
+        return 1;
+    }
+
+    int rc = 1;
+    sock_t sock = SETU_BAD_SOCK;
+    struct addrinfo hints;
+    struct addrinfo *res = NULL;
+
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+
+    int gai = getaddrinfo(host, port, &hints, &res);
+    if (gai != 0) {
+        fprintf(stderr, "webget: getaddrinfo(%s:%s): %s\n", host, port, gai_strerror(gai));
+        goto cleanup;
+    }
+
+    for (struct addrinfo *ai = res; ai != NULL; ai = ai->ai_next) {
+        sock_t s = socket(ai->ai_family, ai->ai_socktype, ai->ai_protocol);
+        if (s == SETU_BAD_SOCK) {
+            continue;
+        }
+        if (connect(s, ai->ai_addr, (sock_len_t)ai->ai_addrlen) == 0) {
+            sock = s;
+            break;
+        }
+        sock_close(s);
     }
     freeaddrinfo(res);
-    if (s == SETU_BAD_SOCK) { fprintf(stderr, "connect failed (%d)\n", sock_errno()); net_cleanup(); return 1; }
+    res = NULL;
 
-    char req[1024];
-    int n = snprintf(req, sizeof req, "GET %s HTTP/1.1\r\nHost: %s\r\nConnection: close\r\n\r\n", path, host);
-    if (send_all(s, req, (size_t)n) != 0) { fprintf(stderr, "send failed\n"); return 1; }
-
-    char buf[4096]; long total = 0;
-    for (;;) {                                    /* recv() returns whatever has arrived; 0 = peer's FIN */
-        int k = recv(s, buf, sizeof buf, 0);
-        if (k < 0) { fprintf(stderr, "recv error %d\n", sock_errno()); break; }
-        if (k == 0) break;
-        fwrite(buf, 1, (size_t)k, stdout);
-        total += k;
+    if (sock == SETU_BAD_SOCK) {
+        fprintf(stderr, "webget: failed to connect to %s:%s (errno=%d)\n", host, port, sock_errno());
+        goto cleanup;
     }
-    fprintf(stderr, "\n[webget] %ld bytes received\n", total);
-    sock_close(s);
+
+    char req[4096];
+    /* Connection: close asks the server to send FIN after the response so recv() == 0 terminates. */
+    int req_len = snprintf(req, sizeof(req),
+                           "GET %s HTTP/1.1\r\nHost: %s\r\nConnection: close\r\n\r\n",
+                           path, host);
+    if (req_len < 0 || (size_t)req_len >= sizeof(req)) {
+        fprintf(stderr, "webget: request too long for buffer\n");
+        goto cleanup;
+    }
+
+    if (send_all(sock, req, (size_t)req_len) != 0) {
+        fprintf(stderr, "webget: send failed (errno=%d)\n", sock_errno());
+        goto cleanup;
+    }
+
+    char buf[8192];
+    uint64_t total = 0;
+    for (;;) {
+#ifdef _WIN32
+        int n = recv(sock, buf, (int)sizeof(buf), 0);
+#else
+        ssize_t n = recv(sock, buf, sizeof(buf), 0);
+#endif
+        /* recv() returning 0 means the peer sent FIN (clean end of stream). */
+        if (n == 0) {
+            break;
+        }
+        if (n < 0) {
+            fprintf(stderr, "webget: recv failed (errno=%d)\n", sock_errno());
+            goto cleanup;
+        }
+        if (fwrite(buf, 1, (size_t)n, stdout) != (size_t)n) {
+            fprintf(stderr, "webget: fwrite to stdout failed\n");
+            goto cleanup;
+        }
+        total += (uint64_t)n;
+    }
+
+    fprintf(stderr, "[webget] %" PRIu64 " bytes received\n", total);
+    rc = 0;
+
+cleanup:
+    if (sock != SETU_BAD_SOCK) {
+        sock_close(sock);
+    }
     net_cleanup();
-    return 0;
+    return rc;
 }
