@@ -61,3 +61,10 @@
 - **Verification:** Nothing tested here.
 - **Files created/changed:** `CapStone-Project\setu\link\verify\W01-DELAY-ACCOUNTING.md`, `CapStone-Project\setu\logs\week-01.md`
 - **Suggested commit message:** `docs(w01): add delay accounting breakdown`
+
+## Added Week 1 draft to JOURNEY.md
+- **Date:** 2026-11-23
+- **What was asked:** Append a `## Week 1 (DRAFT, student to edit)` section to `JOURNEY.md` (explicitly authorized).
+- **Verification:** Nothing tested here.
+- **Files changed:** `CapStone-Project\setu\JOURNEY.md`, `CapStone-Project\setu\logs\week-01.md`
+- **Suggested commit message:** `docs(w01): add week 1 draft entry to JOURNEY.md`
