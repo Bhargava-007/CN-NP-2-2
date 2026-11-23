@@ -26,3 +26,11 @@
 - **Verification:** Not tested (no compiler/WSL run here).
 - **Files changed:** `CapStone-Project\setu\stack\src\byte_stream.h`, `CapStone-Project\setu\stack\src\byte_stream.c`, `CapStone-Project\setu\logs\week-01.md`
 - **Suggested commit message:** `feat(cp0): implement ring-buffer ByteStream`
+
+## Updated bs_remaining to be independent of closed (CP0 fix)
+- **Date:** 2026-11-23
+- **What changed:** `bs_remaining` in `stack/src/byte_stream.c` now returns `cap - len` (0 only if `s` is `NULL`, `buf` is `NULL`, or `len >= cap`), independent of `closed`; updated its doc comment in `stack/src/byte_stream.h`.
+- **Why:** Window is `cap - len`; `closed` is already handled in `bs_write`.
+- **Verification:** Untested (not compiled/run here).
+- **Files changed:** `CapStone-Project\setu\stack\src\byte_stream.c`, `CapStone-Project\setu\stack\src\byte_stream.h`, `CapStone-Project\setu\logs\week-01.md`
+- **Suggested commit message:** `fix(cp0): make bs_remaining independent of closed`
