@@ -68,3 +68,9 @@
 - **Verification:** Nothing tested here.
 - **Files changed:** `CapStone-Project\setu\JOURNEY.md`, `CapStone-Project\setu\logs\week-01.md`
 - **Suggested commit message:** `docs(w01): add week 1 draft entry to JOURNEY.md`
+
+## Cleaned up JOURNEY.md draft markers
+- **Date:** 2026-11-23
+- **What changed:** Removed `(DRAFT, student to edit)` from Week 0 and Week 1 headings in `JOURNEY.md`, and tightened Week 1 `Cost accepted` to 3 sentences.
+- **Files changed:** `CapStone-Project\setu\JOURNEY.md`, `CapStone-Project\setu\logs\week-01.md`
+- **Suggested commit message:** `docs(journey): finalize week 0 and week 1 entries`
