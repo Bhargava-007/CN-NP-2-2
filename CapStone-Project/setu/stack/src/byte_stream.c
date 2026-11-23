@@ -40,7 +40,7 @@ void bs_free(bytestream *s) {
 }
 
 size_t bs_remaining(const bytestream *s) {
-    if (!s || s->closed || s->len >= s->cap) {
+    if (!s || !s->buf || s->len >= s->cap) {
         return 0;
     }
     return s->cap - s->len;

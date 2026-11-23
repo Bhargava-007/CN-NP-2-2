@@ -40,8 +40,8 @@ void bs_free(bytestream *s);
 size_t bs_write(bytestream *s, const char *data, size_t n);
 
 /*
- * Return remaining writable capacity (cap - len).
- * Contract: returns 0 if s is NULL or closed.
+ * Return remaining buffer capacity (cap - len), independent of closed.
+ * Contract: returns 0 only if s is NULL, buf is NULL, or len >= cap.
  */
 size_t bs_remaining(const bytestream *s);
 
