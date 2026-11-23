@@ -7,3 +7,4 @@ stack/build-linux/
 __pycache__/
 .venv/
 tools/bin/
+clab-*/
