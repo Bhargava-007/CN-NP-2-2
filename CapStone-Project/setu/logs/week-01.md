@@ -8,3 +8,13 @@
 - **Verification:** Not tested (WSL/PowerShell execution not run here).
 - **Files changed:** `CapStone-Project\setu\SetuLab\SetuLab.psm1`, `CapStone-Project\setu\logs\week-01.md`
 - **Suggested commit message:** `fix(kit): handle native stderr in Invoke-SetuWsl on PS 5.1`
+
+## Created W01-FIELD-DIFF.md from measured capture output
+- **Date:** 2026-11-23
+- **What was asked:** Create `link/verify/W01-FIELD-DIFF.md` with the UDP request and ICMP port-unreachable reply field-diff tables and observations.
+- **What happened:** Created `CapStone-Project\setu\link\verify\W01-FIELD-DIFF.md`.
+- **Notes / operational findings:**
+  - Stock `Invoke-SetuCapture` writes nothing on this setup (`tcpdump` runs as user `tcpdump` and cannot write to `/mnt/c`, with errors hidden), so captures were taken to `/tmp` and copied.
+  - The WSL distro must be kept alive with a hidden `sleep infinity` or containers restart and lose links.
+- **Files created/changed:** `CapStone-Project\setu\link\verify\W01-FIELD-DIFF.md`, `CapStone-Project\setu\logs\week-01.md`
+- **Suggested commit message:** `docs(w01): add field-diff table and capture notes`
