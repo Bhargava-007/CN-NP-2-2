@@ -22,3 +22,13 @@
 - **Verification:** Log entry only; nothing tested here.
 - **Files changed:** `CapStone-Project\setu\logs\week-02.md`
 - **Suggested commit message:** `docs(w02): log bufferbloat and tbf queue-bounding measurements`
+
+## Queueing knee (MEASURED, dev01 -> srv01, UDP iperf3 offered load, tbf rate 100mbit burst 16kb latency 50ms on dev01 egress, ICMP probes during load, host CPU not measured)
+- **Date:** 2026-11-24
+- **First pass (1 run x 60 probes):** `50M` p50 `0.063` ms, p99 `0.203` ms; `80M` `0.061 / 2.4` ms (outlier); `90M` `0.061 / 0.274` ms; `95M` `0.059 / 0.170` ms; `105M` `7.29 / 10.5` ms.
+- **Second pass (3 x 100 probes):** `95M` p50 `0.062 / 0.061 / 0.061` ms, p99 `3.15 / 0.254 / 0.497` ms; `100M` p50 `7.27 / 7.16 / 7.11` ms, p99 `9.77 / 9.91 / 9.87` ms; `105M` p50 `7.23 / 7.10 / 7.11` ms, p99 `10.0 / 9.78 / 9.81` ms. Ping loss `0%` everywhere.
+- **Observations:** Knee between `95M` and `100M` offered; p50 jumps about `117x`. Above capacity, delay plateaus near `7 ms`, not the `50 ms` queue ceiling; cause not investigated. UDP throughput and queue drops not captured (`Measure-SetuThroughput -Runs 1` `StrictMode` bug).
+- **Cleanup:** Cleared; baseline p50 `0.091` ms, p99 `0.285` ms confirmed.
+- **Verification:** Log entry only; nothing tested here.
+- **Files changed:** `CapStone-Project\setu\logs\week-02.md`
+- **Suggested commit message:** `docs(w02): log queueing knee measurements`
