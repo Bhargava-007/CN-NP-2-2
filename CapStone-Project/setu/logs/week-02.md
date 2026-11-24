@@ -32,3 +32,10 @@
 - **Verification:** Log entry only; nothing tested here.
 - **Files changed:** `CapStone-Project\setu\logs\week-02.md`
 - **Suggested commit message:** `docs(w02): log queueing knee measurements`
+
+## Created edge/BUDGET.md (v0)
+- **Date:** 2026-11-24
+- **What was asked:** Create `edge/BUDGET.md` v0 with course target, term-by-term budget table, `NOT YET PROVEN` verdict, and open items.
+- **Verification:** Nothing tested here.
+- **Files created/changed:** `CapStone-Project\setu\edge\BUDGET.md`, `CapStone-Project\setu\logs\week-02.md`
+- **Suggested commit message:** `docs(w02): add edge latency and jitter BUDGET.md v0`
