@@ -39,3 +39,10 @@
 - **Verification:** Nothing tested here.
 - **Files created/changed:** `CapStone-Project\setu\edge\BUDGET.md`, `CapStone-Project\setu\logs\week-02.md`
 - **Suggested commit message:** `docs(w02): add edge latency and jitter BUDGET.md v0`
+
+## Added Week 2 entry to JOURNEY.md
+- **Date:** 2026-11-24
+- **What was asked:** Append `## Week 2` to `JOURNEY.md` (explicitly authorized).
+- **Verification:** Nothing tested here.
+- **Files changed:** `CapStone-Project\setu\JOURNEY.md`, `CapStone-Project\setu\logs\week-02.md`
+- **Suggested commit message:** `docs(w02): add week 2 entry to JOURNEY.md`
