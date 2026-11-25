@@ -23,3 +23,9 @@
 - **What happened:** zone reconciled to plan, reverse zone added, serial bumped, nothing tested.
 - **Files created/changed:** `CapStone-Project\setu\link\config\db.setu.local`, `CapStone-Project\setu\link\config\db.48.20.10.in-addr.arpa`, `CapStone-Project\setu\link\config\named.conf.local`, `CapStone-Project\setu\link\topology\w03-services.clab.yml`, `CapStone-Project\setu\logs\week-04.md`
 - **Suggested commit message:** `chore(w04): reconcile DNS zone to ADDRESS-PLAN and add reverse zone`
+
+## Added Week 4 entry to JOURNEY.md
+- **Date:** 2026-11-25
+- **What happened:** `JOURNEY` week 4 entry written, nothing tested.
+- **Files changed:** `CapStone-Project\setu\JOURNEY.md`, `CapStone-Project\setu\logs\week-04.md`
+- **Suggested commit message:** `docs(w04): add week 4 entry to JOURNEY.md`
