@@ -1,16 +1,16 @@
 $TTL 300
 @   IN  SOA ns1.setu.local. ops.setu.local. (
-        2026080401  ; serial - bump on every change
+        2026112501  ; serial - bumped for ADDRESS-PLAN.md reconciliation
         3600        ; refresh
         600         ; retry
         604800      ; expire
         300 )       ; negative-cache TTL
     IN  NS  ns1.setu.local.
-ns1         IN  A     10.20.48.10
-srv-api     IN  A     10.20.48.12
-kea01       IN  A     10.20.48.20
+ns1         IN  A     10.20.48.10   ; matches w03-services.clab.yml DC servers /25
+srv-api     IN  A     10.20.48.8    ; reconciled to w03-services srv01 (10.20.48.8/25)
+kea01       IN  A     10.20.48.9    ; reconciled to w03-services kea01 (10.20.48.9/25)
 readings    IN  CNAME srv-api
 @           IN  MX 10 mail.setu.local.
-mail        IN  A     10.20.48.25
-@           IN  TXT   "v=spf1 ip4:10.20.48.0/24 -all"
-srv-api     IN  AAAA  2001:db8:5e70:30::12
+mail        IN  A     10.20.48.25   ; inside DC servers 10.20.48.0/25
+@           IN  TXT   "v=spf1 ip4:10.20.48.0/25 -all" ; matches DC servers /25
+srv-api     IN  AAAA  2001:db8:5e70:3046::8 ; matches ADDRESS-PLAN.md DC servers /64

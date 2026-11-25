@@ -20,7 +20,7 @@ topology:
       kind: linux
       image: ubuntu/bind9:latest
       ports: ["5353:53/udp"]
-      binds: ["../config/named.conf.local:/etc/bind/named.conf.local", "../config/db.setu.local:/etc/bind/db.setu.local"]
+      binds: ["../config/named.conf.local:/etc/bind/named.conf.local", "../config/db.setu.local:/etc/bind/db.setu.local", "../config/db.48.20.10.in-addr.arpa:/etc/bind/db.48.20.10.in-addr.arpa"]
       exec: ["ip addr add 10.20.48.10/25 dev eth1", "ip route replace default via 10.20.48.1"]
   links:
     - endpoints: ["dev01:eth1", "sw-c:eth1"]

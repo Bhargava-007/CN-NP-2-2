@@ -1,0 +1,12 @@
+$TTL 300
+@   IN  SOA ns1.setu.local. ops.setu.local. (
+        2026112501  ; serial
+        3600        ; refresh
+        600         ; retry
+        604800      ; expire
+        300 )       ; negative-cache TTL
+    IN  NS  ns1.setu.local.
+8   IN  PTR srv-api.setu.local.
+9   IN  PTR kea01.setu.local.
+10  IN  PTR ns1.setu.local.
+25  IN  PTR mail.setu.local.
