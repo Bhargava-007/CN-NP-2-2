@@ -55,3 +55,15 @@
 - **What happened:** `W03-DHCP-FAULTS.md` written from pasted evidence; fault 3 wire capture missing; nothing tested by the IDE.
 - **Files created/changed:** `CapStone-Project\setu\link\diagnostics\W03-DHCP-FAULTS.md`, `CapStone-Project\setu\logs\week-03.md`
 - **Suggested commit message:** `docs(w03): add DHCP fault bank from measured runs`
+
+## Created TOPOLOGY.md and POLICY.md stubs
+- **Date:** 2026-11-25
+- **What happened:** `TOPOLOGY.md` and `POLICY.md` stubs written, nothing tested.
+- **Files created/changed:** `CapStone-Project\setu\link\design\TOPOLOGY.md`, `CapStone-Project\setu\link\design\POLICY.md`, `CapStone-Project\setu\logs\week-03.md`
+- **Suggested commit message:** `docs(w03): add TOPOLOGY.md and POLICY.md design stubs`
+
+## Added Week 3 entry to JOURNEY.md
+- **Date:** 2026-11-25
+- **What happened:** `JOURNEY` week 3 entry written, nothing tested.
+- **Files changed:** `CapStone-Project\setu\JOURNEY.md`, `CapStone-Project\setu\logs\week-03.md`
+- **Suggested commit message:** `docs(w03): add week 3 entry to JOURNEY.md`
