@@ -46,6 +46,7 @@ typedef struct {
     int closing;
     int peer_closed;
     int backpressured;
+    int blocking;
     uint32_t ep_events;
 } conn_t;
 
@@ -173,6 +174,11 @@ static int outq_flush(conn_t *c) {
             c->outlen -= (size_t)n;
             c->last_active_ms = now_ms();
         } else if (n < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
+            /* Blocking socket with SO_SNDTIMEO: EAGAIN means send timeout -> close connection. */
+            if (c->blocking) {
+                __atomic_fetch_add(&g_idle_closed, 1, __ATOMIC_RELAXED);
+                return -1;
+            }
             return 0;
         } else if (n < 0 && errno == EINTR) {
             continue;
@@ -245,12 +251,14 @@ static void *worker_thread(void *p) {
 
     struct timeval tv = { .tv_sec = idle_s, .tv_usec = 0 };
     setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
+    setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, &tv, sizeof(tv));
 
     conn_t *c = conn_new(fd, outcap);
     if (!c) {
         close(fd);
         return NULL;
     }
+    c->blocking = 1;
 
     for (;;) {
         if (c->inlen >= INBUF_SZ) {
