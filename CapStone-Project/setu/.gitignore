@@ -14,3 +14,4 @@ build/
 *.exe
 *.o
 tools/w64devkit/
+stack/measure/costcurve-epoll-v2.txt
