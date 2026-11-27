@@ -22,6 +22,7 @@
 | Packages inside setu-lab: curl ca-certificates tcpdump tshark iperf3 jq ethtool iproute2 build-essential cmake netcat-openbsd python3 python3-venv git ansible docker.io dnsutils (dig 9.20.24) (about 1.3 GB added, measured: distro 2.0 GB -> 3.3 GB) | inside setu-lab only | removed by: `wsl --unregister setu-lab` |
 | Docker 29.1.3 (Ubuntu docker.io package, enabled via systemd) | inside setu-lab | removed by: `wsl --unregister setu-lab` |
 | containerlab 0.83.0 from apt source `/etc/apt/sources.list.d/netdevops.list` (`deb [trusted=yes] https://netdevops.fury.site/apt/ /`, unsigned repo, accepted risk, confined to setu-lab) | inside setu-lab | removed by: `wsl --unregister setu-lab` |
+| `matplotlib` (Python venv) | `/tmp/pv` inside `setu-lab` only | removed when `/tmp` is cleared or `wsl --unregister setu-lab` |
 
 ## Final cleanup
 - [ ] `wsl --unregister setu-lab ; Remove-Item -Recurse $env:LOCALAPPDATA\setu-lab`
