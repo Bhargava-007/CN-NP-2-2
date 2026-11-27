@@ -157,3 +157,47 @@ Because every segment stays strictly inside its site `/20`, the core never needs
 - Reserve the first `10` usable addresses of each segment for static assignments, gateway, and HSRP/VRRP.
 - Guest isolation is handled in `POLICY.md`.
 - Existing lab-kit addresses (`10.20.40.0/24`, etc.) are NOT part of this plan and will be reconciled in step 3.
+
+## 8. Reverse DNS Zones
+
+### IPv4 (`in-addr.arpa`)
+
+| Segment | Prefix | Reverse zone(s) needed | Delegation note | Status |
+| :--- | :--- | :--- | :--- | :--- |
+| BLD-A staff | `10.20.0.0/23` | `0.20.10.in-addr.arpa`, `1.20.10.in-addr.arpa` | Two `/24` zones on octet boundary | planned, not tested |
+| BLD-A guest | `10.20.2.0/23` | `2.20.10.in-addr.arpa`, `3.20.10.in-addr.arpa` | Two `/24` zones on octet boundary | planned, not tested |
+| BLD-A voice | `10.20.4.0/24` | `4.20.10.in-addr.arpa` | Single `/24` zone | planned, not tested |
+| BLD-A student | `10.20.5.0/26` | `5.20.10.in-addr.arpa` | RFC 2317 classless delegation (`0-63.5.20.10.in-addr.arpa` CNAME-range style) | planned, not tested |
+| BLD-A mgmt | `10.20.5.64/26` | `5.20.10.in-addr.arpa` | RFC 2317 classless delegation (`64-127.5.20.10.in-addr.arpa` CNAME-range style) | planned, not tested |
+| BLD-B student | `10.20.16.0/22` | `16.20.10.in-addr.arpa` .. `19.20.10.in-addr.arpa` | Four `/24` zones on octet boundary | planned, not tested |
+| BLD-B guest | `10.20.20.0/22` | `20.20.10.in-addr.arpa` .. `23.20.10.in-addr.arpa` | Four `/24` zones on octet boundary | planned, not tested |
+| BLD-B staff | `10.20.24.0/23` | `24.20.10.in-addr.arpa`, `25.20.10.in-addr.arpa` | Two `/24` zones on octet boundary | planned, not tested |
+| BLD-B voice | `10.20.26.0/24` | `26.20.10.in-addr.arpa` | Single `/24` zone | planned, not tested |
+| BLD-B mgmt | `10.20.27.0/25` | `27.20.10.in-addr.arpa` | RFC 2317 classless delegation (`0-127.27.20.10.in-addr.arpa` CNAME-range style) | planned, not tested |
+| BLD-C student | `10.20.32.0/23` | `32.20.10.in-addr.arpa`, `33.20.10.in-addr.arpa` | Two `/24` zones on octet boundary | planned, not tested |
+| BLD-C guest | `10.20.34.0/23` | `34.20.10.in-addr.arpa`, `35.20.10.in-addr.arpa` | Two `/24` zones on octet boundary | planned, not tested |
+| BLD-C staff | `10.20.36.0/24` | `36.20.10.in-addr.arpa` | Single `/24` zone | planned, not tested |
+| BLD-C voice | `10.20.37.0/24` | `37.20.10.in-addr.arpa` | Single `/24` zone | planned, not tested |
+| BLD-C instrumentation | `10.20.38.0/24` | `38.20.10.in-addr.arpa` | Single `/24` zone | planned, not tested |
+| BLD-C mgmt | `10.20.39.0/25` | `39.20.10.in-addr.arpa` | RFC 2317 classless delegation (`0-127.39.20.10.in-addr.arpa` CNAME-range style) | planned, not tested |
+| DC servers | `10.20.48.0/25` | `48.20.10.in-addr.arpa` | Parent `/24` zone; RFC 2317 (`0-127.48.20.10.in-addr.arpa`) if split | built in `link\config\db.48.20.10.in-addr.arpa` |
+| DC storage | `10.20.48.128/26` | `48.20.10.in-addr.arpa` | RFC 2317 classless delegation (`128-191.48.20.10.in-addr.arpa` CNAME-range style) | planned, not tested |
+| DC mgmt | `10.20.48.192/27` | `48.20.10.in-addr.arpa` | RFC 2317 classless delegation (`192-223.48.20.10.in-addr.arpa` CNAME-range style) | planned, not tested |
+| Infra links | `10.20.64.0/24` (`/31`s) | `64.20.10.in-addr.arpa` | Parent `/24` zone; RFC 2317 CNAME-range style if delegated per `/31` | planned, not tested |
+| Infra loopbacks | `10.20.65.0/24` (`/32`s) | `65.20.10.in-addr.arpa` | Parent `/24` zone | planned, not tested |
+
+### IPv6 (`ip6.arpa`)
+
+- Global `/48` (`2001:db8:5e70::/48`): `0.7.e.5.8.b.d.0.1.0.0.2.ip6.arpa` (12 nibble labels + `ip6.arpa` = 14 labels; planned, not tested).
+- Site `/52` zones (nibble-aligned, 13 nibble labels + `ip6.arpa` = 15 labels; all planned, not tested):
+  - `BLD-A` (`2001:db8:5e70:0000::/52`): `0.0.7.e.5.8.b.d.0.1.0.0.2.ip6.arpa`
+  - `BLD-B` (`2001:db8:5e70:1000::/52`): `1.0.7.e.5.8.b.d.0.1.0.0.2.ip6.arpa`
+  - `BLD-C` (`2001:db8:5e70:2000::/52`): `2.0.7.e.5.8.b.d.0.1.0.0.2.ip6.arpa`
+  - `DC` (`2001:db8:5e70:3000::/52`): `3.0.7.e.5.8.b.d.0.1.0.0.2.ip6.arpa`
+  - `Infrastructure` (`2001:db8:5e70:f000::/52`): `f.0.7.e.5.8.b.d.0.1.0.0.2.ip6.arpa`
+
+### What Is Already Built
+
+- `48.20.10.in-addr.arpa` exists for DC servers (`10.20.48.0/25`) in `link\config\db.48.20.10.in-addr.arpa`.
+- All other IPv4 and IPv6 reverse zones are planned, not created.
+- No reverse zone other than `48.20.10.in-addr.arpa` has been tested.
