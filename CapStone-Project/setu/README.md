@@ -61,6 +61,8 @@ With CMake (`stack/CMakeLists.txt`, Windows build, not yet tested):
 cmake -S stack -B stack/build ; cmake --build stack/build --config Debug ; ctest --test-dir stack/build -C Debug
 ```
 
+Note: `stack/measure/costcurve-raw.txt` is superseded by `stack/measure/costcurve-c-k1.txt`, and the `server_epoll` CMake target builds the shipped reference server, not our own.
+
 ## Week-by-Week Status
 
 | Week | Scope | Status |
