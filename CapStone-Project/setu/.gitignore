@@ -8,3 +8,9 @@ __pycache__/
 .venv/
 tools/bin/
 clab-*/
+IDE-RULES.md
+logs/
+build/
+*.exe
+*.o
+tools/w64devkit/
