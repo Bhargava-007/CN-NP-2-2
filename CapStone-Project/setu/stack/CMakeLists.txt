@@ -20,7 +20,7 @@ function(setu_net_exe name)
   endif()
 endfunction()
 
-add_library(setu_core STATIC src/byte_stream.c src/reassembler.c src/receiver.c src/sender.c src/ip_tcp.c src/tcp_core.c src/router_lpm.c src/crc32.c)
+add_library(setu_core STATIC src/byte_stream.c src/reassembler.c src/receiver.c src/sender.c src/ip_tcp.c src/tcp_connection.c src/tcp_core.c src/router_lpm.c src/crc32.c)
 
 setu_net_exe(webget        src/webget.c)
 setu_net_exe(http_server   src/http_server.c)
@@ -35,7 +35,7 @@ add_executable(setu_tcp src/setu_tcp.c)
 target_link_libraries(setu_tcp setu_core)
 
 enable_testing()
-foreach(t byte_stream reassembler receiver sender ip_tcp tcp_core router_lpm crc32)
+foreach(t byte_stream reassembler receiver sender ip_tcp tcp_connection tcp_core router_lpm crc32)
   add_executable(test_${t} tests/test_${t}.c)
   target_link_libraries(test_${t} setu_core)
   add_test(NAME ${t} COMMAND test_${t})
